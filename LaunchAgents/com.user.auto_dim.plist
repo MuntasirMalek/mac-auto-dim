@@ -9,15 +9,13 @@
    <key>ProgramArguments</key>
    <array>
      <string>/bin/bash</string>
-     <string>/Users/$(whoami)/bin/auto_dim.sh</string>
+     <string>/Users/${USER}/bin/auto_dim.sh</string>
    </array>
 
    <key>EnvironmentVariables</key>
    <dict>
      <key>PATH</key>
      <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
-     <key>HOME</key>
-     <string>/Users/$(whoami)</string>
    </dict>
 
    <key>LimitLoadToSessionType</key>
@@ -29,8 +27,8 @@
    <true/>
 
    <key>StandardOutPath</key>
-   <string>/Users/$(whoami)/Library/Logs/auto_dim.out.log</string>
+   <string>/Users/${USER}/Library/Logs/auto_dim.out.log</string>
    <key>StandardErrorPath</key>
-   <string>/Users/$(whoami)/Library/Logs/auto_dim.err.log</string>
+   <string>/Users/${USER}/Library/Logs/auto_dim.err.log</string>
  </dict>
 </plist> 

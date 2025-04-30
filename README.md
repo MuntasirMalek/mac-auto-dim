@@ -17,8 +17,12 @@ git clone https://github.com/MuntasirMalek/mac-auto-dim.git
 cd mac-auto-dim
 ```
 
-2. Copy files to their locations:
+2. Install the files:
 ```bash
+# First, remove any existing installation
+launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
+rm -f ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+
 # Create directories
 mkdir -p ~/bin
 mkdir -p ~/Library/LaunchAgents
@@ -27,14 +31,14 @@ mkdir -p ~/Library/LaunchAgents
 cp bin/auto_dim.sh ~/bin/
 chmod 755 ~/bin/auto_dim.sh
 
-# Copy and set permissions for the LaunchAgent
+# Copy LaunchAgent and replace ${USER} with your username
 cp LaunchAgents/com.user.auto_dim.plist ~/Library/LaunchAgents/
+sed -i '' "s/\${USER}/$(whoami)/g" ~/Library/LaunchAgents/com.user.auto_dim.plist
 chmod 644 ~/Library/LaunchAgents/com.user.auto_dim.plist
 ```
 
 3. Start the auto-dim service:
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
 launchctl load ~/Library/LaunchAgents/com.user.auto_dim.plist
 ```
 
@@ -51,7 +55,7 @@ That's it! Your screen will now automatically dim after 60 seconds of inactivity
 To remove auto-dim:
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist
-rm ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+rm -f ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 ```
 
 ## How it Works
@@ -59,13 +63,20 @@ rm ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brig
 - The script checks for system idle time every 5 seconds
 - If the system has been idle for more than 60 seconds, it saves the current brightness level and dims the screen
 - When activity is detected, it restores the previous brightness level
-- Logs are written to `~/Library/Logs/auto_dim.log`
+- Logs are written to `~/Library/Logs/auto_dim.{out,err}.log`
 
 ## Troubleshooting
 
-Check the log files for any issues:
-- `~/Library/Logs/auto_dim.out.log` - Standard output
-- `~/Library/Logs/auto_dim.err.log` - Error output
+1. If the service isn't starting:
+   ```bash
+   # Check the log files
+   cat ~/Library/Logs/auto_dim.out.log
+   cat ~/Library/Logs/auto_dim.err.log
+   ```
+
+2. If the screen isn't dimming:
+   - Make sure `brightness` command works: `brightness -l`
+   - Check if the script is running: `ps aux | grep auto_dim`
 
 ## Contributing
 
