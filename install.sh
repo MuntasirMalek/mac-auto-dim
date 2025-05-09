@@ -13,6 +13,7 @@ launchctl remove com.user.auto_dim 2>/dev/null
 launchctl bootout gui/$UID/com.user.auto_dim 2>/dev/null
 pkill -f auto_dim.sh 2>/dev/null
 rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+sudo rm -f /usr/local/bin/auto-dim 2>/dev/null
 
 # Create directories
 mkdir -p ~/bin
@@ -24,8 +25,9 @@ cp bin/configure.sh ~/bin/
 chmod 755 ~/bin/auto_dim.sh
 chmod 755 ~/bin/configure.sh
 
-# Create a symlink for easier access
-ln -sf ~/bin/configure.sh ~/bin/auto-dim
+# Create a symlink in /usr/local/bin for global access
+sudo ln -sf ~/bin/configure.sh /usr/local/bin/auto-dim
+chmod 755 /usr/local/bin/auto-dim 2>/dev/null
 
 # Copy LaunchAgent and replace ${USER} with your username
 cp LaunchAgents/com.user.auto_dim.plist ~/Library/LaunchAgents/
@@ -56,7 +58,7 @@ fi
 if launchctl list | grep -q "com.user.auto_dim"; then
     STATUS="started"
 else
-    STATUS="failed to start (you can start it manually with ~/bin/auto-dim --start)"
+    STATUS="failed to start (you can start it manually with auto-dim --start)"
 fi
 
 # Clean up installation files
@@ -66,5 +68,5 @@ rm -rf /tmp/mac-auto-dim-install
 echo "✅ Mac Auto-Dim installed successfully with a 1-minute timeout!"
 echo "   Service $STATUS."
 echo "   Your screen will now dim after 1 minute of inactivity."
-echo "   To configure, simply run: ~/bin/auto-dim"
-echo "   For available commands, run: ~/bin/auto-dim --help"
+echo "   To configure or control, simply run: auto-dim"
+echo "   For available commands, run: auto-dim --help"

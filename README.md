@@ -27,7 +27,7 @@ Auto-dim includes a user-friendly configuration tool. You can run it in two ways
 
 Simply run:
 ```bash
-~/bin/auto-dim
+auto-dim
 ```
 
 This brings up a simple menu where you can:
@@ -41,28 +41,29 @@ Quick commands for common actions:
 
 ```bash
 # Set idle time to any number of seconds
-~/bin/auto-dim --time SECONDS
-~/bin/auto-dim --time 30 #Example for 30 seconds
+auto-dim --time SECONDS
+auto-dim --time 30 #Example for 30 seconds
 
 # Turn auto-dim on
-~/bin/auto-dim --start
+auto-dim --start
 
 # Turn auto-dim off
-~/bin/auto-dim --stop
+auto-dim --stop
 
 # Show current settings
-~/bin/auto-dim --status
+auto-dim --status
 
 # Show help
-~/bin/auto-dim --help
+auto-dim --help
 ```
 
 ## Uninstall
 
 The easiest way to uninstall is to just use:
 ```bash
-~/bin/auto-dim --stop
-rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+auto-dim --stop
+sudo rm -f /usr/local/bin/auto-dim
+rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 ```
 
 If you encounter any issues stopping the service, try these alternative methods:
@@ -74,7 +75,8 @@ launchctl remove com.user.auto_dim
 pkill -f auto_dim.sh
 
 # Then remove the files
-rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+sudo rm -f /usr/local/bin/auto-dim
+rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 ```
 
 ## How it Works
@@ -100,7 +102,7 @@ rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents
 3. If you get "Input/output error" when trying to unload the service:
    - This is a common issue on newer macOS versions
    - Use `launchctl remove com.user.auto_dim` instead
-   - Or stop using the configuration tool: `~/bin/auto-dim --stop`
+   - Or stop using the configuration tool: `auto-dim --stop`
 
 ## Contributing
 
