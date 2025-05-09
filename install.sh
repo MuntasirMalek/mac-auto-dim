@@ -7,7 +7,10 @@ mkdir -p /tmp/mac-auto-dim-install && cd /tmp/mac-auto-dim-install
 git clone https://github.com/MuntasirMalek/mac-auto-dim.git .
 
 # Remove any existing installation
+# Try different methods to ensure it stops on all macOS versions
 launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
+launchctl remove com.user.auto_dim 2>/dev/null
+pkill -f auto_dim.sh 2>/dev/null
 rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 
 # Create directories

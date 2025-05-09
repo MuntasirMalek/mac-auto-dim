@@ -106,9 +106,21 @@ Quick commands for common actions:
 
 ## Uninstall
 
-To remove auto-dim, simply run:
+The easiest way to uninstall is to just use:
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist
+~/bin/auto-dim --stop
+rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+```
+
+If you encounter any issues stopping the service, try these alternative methods:
+```bash
+# Alternative 1: Use the remove command
+launchctl remove com.user.auto_dim
+
+# Alternative 2: Kill the process directly
+pkill -f auto_dim.sh
+
+# Then remove the files
 rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 ```
 
@@ -131,6 +143,11 @@ rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents
 2. If the screen isn't dimming:
    - Make sure `brightness` command works: `brightness -l`
    - Check if the script is running: `ps aux | grep auto_dim`
+
+3. If you get "Input/output error" when trying to unload the service:
+   - This is a common issue on newer macOS versions
+   - Use `launchctl remove com.user.auto_dim` instead
+   - Or stop using the configuration tool: `~/bin/auto-dim --stop`
 
 ## Contributing
 

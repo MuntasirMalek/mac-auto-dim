@@ -47,19 +47,34 @@ update_idle_time() {
     echo "Restarting service for changes to take effect..."
     
     # Restart the service
-    launchctl unload "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
-    launchctl load "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
+    stop_service
+    start_service
     
     echo -e "${GREEN}Done!${NC} Auto-dim will now activate after $1 seconds of inactivity."
+}
+
+# Function to start the service
+start_service() {
+    launchctl load "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
+}
+
+# Function to stop the service
+stop_service() {
+    # Try both methods to ensure it stops
+    launchctl unload "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
+    launchctl remove "com.user.auto_dim" 2>/dev/null
+    
+    # As a fallback, kill any running processes
+    pkill -f "auto_dim.sh" 2>/dev/null
 }
 
 # Function to control the service
 control_service() {
     if [ "$1" == "start" ]; then
-        launchctl load "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
+        start_service
         echo -e "${GREEN}Auto-dim started!${NC}"
     elif [ "$1" == "stop" ]; then
-        launchctl unload "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
+        stop_service
         echo -e "${GREEN}Auto-dim stopped!${NC}"
     else
         echo "Invalid command. Use 'start' or 'stop'."
