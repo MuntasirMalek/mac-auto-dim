@@ -113,9 +113,7 @@ show_menu() {
             echo
             read -p "Enter new idle time in seconds (e.g., 60 for 1 minute): " seconds
             update_idle_time "$seconds"
-            echo
-            read -p "Press Enter to continue..."
-            show_menu
+            exit 0
             ;;
         2)
             control_service "start"
@@ -123,9 +121,7 @@ show_menu() {
             ;;
         3)
             control_service "stop"
-            echo
-            read -p "Press Enter to continue..."
-            show_menu
+            exit 0
             ;;
         4)
             echo "Goodbye!"
@@ -133,9 +129,7 @@ show_menu() {
             ;;
         *)
             echo "Invalid choice. Please try again."
-            echo
-            read -p "Press Enter to continue..."
-            show_menu
+            exit 1
             ;;
     esac
 }
