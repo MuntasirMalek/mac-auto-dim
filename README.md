@@ -11,7 +11,13 @@ brew install brightness bc
 
 ## Quick Installation (1-Minute Default)
 
-Copy and paste this entire script into your Terminal to install Mac Auto-Dim with a 1-minute timeout:
+Option 1: Run this single command in your Terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MuntasirMalek/mac-auto-dim/main/install.sh | bash
+```
+
+Option 2: Or, if you prefer to see the installation process step by step:
 
 ```bash
 # Create a temporary directory for the installation
