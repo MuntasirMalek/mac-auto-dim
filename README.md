@@ -1,6 +1,6 @@
 # Mac Auto-Dim
 
-Automatically dims your Mac's screen after 60 seconds of inactivity and restores brightness when you return.
+Automatically dims your Mac's screen after a period of inactivity and restores brightness when you return.
 
 ## Requirements
 
@@ -9,59 +9,109 @@ Install these with Homebrew:
 brew install brightness bc
 ```
 
-## Installation
+## Quick Installation (1-Minute Default)
 
-1. Clone this repository:
-```bash
-git clone https://github.com/MuntasirMalek/mac-auto-dim.git
-cd mac-auto-dim
-```
+Copy and paste this entire script into your Terminal to install Mac Auto-Dim with a 1-minute timeout:
 
-2. Install the files:
 ```bash
-# First, remove any existing installation
+# Create a temporary directory for the installation
+mkdir -p /tmp/mac-auto-dim-install && cd /tmp/mac-auto-dim-install
+
+# Clone the repository
+git clone https://github.com/MuntasirMalek/mac-auto-dim.git .
+
+# Remove any existing installation
 launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
-rm -f ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 
 # Create directories
 mkdir -p ~/bin
 mkdir -p ~/Library/LaunchAgents
 
-# Copy and set permissions for the script
+# Copy and set permissions for the scripts
 cp bin/auto_dim.sh ~/bin/
+cp bin/configure.sh ~/bin/
 chmod 755 ~/bin/auto_dim.sh
+chmod 755 ~/bin/configure.sh
+
+# Create a symlink for easier access
+ln -sf ~/bin/configure.sh ~/bin/auto-dim
 
 # Copy LaunchAgent and replace ${USER} with your username
 cp LaunchAgents/com.user.auto_dim.plist ~/Library/LaunchAgents/
 sed -i '' "s/\${USER}/$(whoami)/g" ~/Library/LaunchAgents/com.user.auto_dim.plist
 chmod 644 ~/Library/LaunchAgents/com.user.auto_dim.plist
-```
 
-3. Start the auto-dim service:
-```bash
+# Set the default idle time to 60 seconds (1 minute)
+sed -i '' "s/<key>IDLE_THRESHOLD<\/key>.*/<key>IDLE_THRESHOLD<\/key>\\
+     <string>60<\/string>/g" ~/Library/LaunchAgents/com.user.auto_dim.plist
+
+# Start the auto-dim service
 launchctl load ~/Library/LaunchAgents/com.user.auto_dim.plist
+
+# Clean up installation files
+cd ~
+rm -rf /tmp/mac-auto-dim-install
+
+echo "✅ Mac Auto-Dim installed successfully with a 1-minute timeout!"
+echo "   Your screen will now dim after 1 minute of inactivity."
+echo "   To configure, simply run: ~/bin/auto-dim"
 ```
 
-4. Verify it's running:
+That's it! Your screen will now automatically dim after 1 minute of inactivity.
+
+## Easy Configuration
+
+Auto-dim includes a user-friendly configuration tool. You can run it in two ways:
+
+### Interactive Menu
+
+Simply run:
 ```bash
-launchctl list | grep com.user.auto_dim
+~/bin/auto-dim
 ```
-You should see something like: `XXXX 0 com.user.auto_dim` where XXXX is a number.
 
-That's it! Your screen will now automatically dim after 60 seconds of inactivity.
+This brings up a simple menu where you can:
+- Change the idle time before dimming
+- Start or stop the auto-dim service
+- View current settings
+
+### Command Line
+
+Quick commands for common actions:
+
+```bash
+# Change idle time to 2 minutes (120 seconds)
+~/bin/auto-dim --time 120
+
+# Change to 30 seconds
+~/bin/auto-dim --time 30
+
+# Turn auto-dim on
+~/bin/auto-dim --start
+
+# Turn auto-dim off
+~/bin/auto-dim --stop
+
+# Show current settings
+~/bin/auto-dim --status
+
+# Show help
+~/bin/auto-dim --help
+```
 
 ## Uninstall
 
-To remove auto-dim:
+To remove auto-dim, simply run:
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist
-rm -f ~/bin/auto_dim.sh ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
+rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 ```
 
 ## How it Works
 
 - The script checks for system idle time every 5 seconds
-- If the system has been idle for more than 60 seconds, it saves the current brightness level and dims the screen
+- If the system has been idle for more than the configured time, it saves the current brightness level and dims the screen
 - When activity is detected, it restores the previous brightness level
 - Logs are written to `~/Library/Logs/auto_dim.{out,err}.log`
 

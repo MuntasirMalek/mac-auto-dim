@@ -7,6 +7,8 @@ BC="/usr/local/opt/bc/bin/bc"
 BRIGHT_CMD="/usr/local/bin/brightness"
 
 PREV_FILE="$HOME/.prev_brightness"
+# Set idle time threshold in seconds (default: 60)
+IDLE_THRESHOLD="${IDLE_THRESHOLD:-60}"
 
 while true; do
     # 1) Read idle time (sec):
@@ -17,8 +19,8 @@ while true; do
     curr=$($BRIGHT_CMD -l \
            | $AWK '/display 0:/ && /brightness/ {print $4; exit}')
 
-    if (( $($BC <<< "$idle > 60") )); then
-        # Idle >60 s & not already off → save & dim
+    if (( $($BC <<< "$idle > $IDLE_THRESHOLD") )); then
+        # Idle > threshold & not already off → save & dim
         if (( $(echo "$curr > 0" | bc -l) )); then
             echo "$curr" > "$PREV_FILE"
             $BRIGHT_CMD 0
