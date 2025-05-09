@@ -40,21 +40,30 @@ update_idle_time() {
         return 1
     fi
     
-    # First, extract the EnvironmentVariables section
-    env_vars_section=$(awk '/<key>EnvironmentVariables<\/key>/,/<\/dict>/' "$HOME/Library/LaunchAgents/com.user.auto_dim.plist")
+    # Create a temporary file with the new content
+    temp_file=$(mktemp)
     
-    # Create a clean section with just PATH and the new IDLE_THRESHOLD
-    new_env_vars="   <key>EnvironmentVariables</key>
-   <dict>
-     <key>PATH</key>
-     <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
-     <key>IDLE_THRESHOLD</key>
-     <string>$1</string>
-   </dict>"
+    # Create the new plist file with the updated IDLE_THRESHOLD
+    awk -v new_time="$1" '
+    /<key>EnvironmentVariables<\/key>/,/<\/dict>/ {
+        if (!env_vars_found) {
+            print "   <key>EnvironmentVariables</key>"
+            print "   <dict>"
+            print "     <key>PATH</key>"
+            print "     <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>"
+            print "     <key>IDLE_THRESHOLD</key>"
+            print "     <string>" new_time "</string>"
+            print "   </dict>"
+            env_vars_found = 1
+        }
+        if (/<\/dict>/) env_vars_section = 0
+        next
+    }
+    { print }
+    ' "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" > "$temp_file"
     
-    # Replace the entire EnvironmentVariables section
-    sed -i '' "/<key>EnvironmentVariables<\/key>/,/<\/dict>/c\\
-$new_env_vars" "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
+    # Replace the original file with the updated one
+    mv "$temp_file" "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
     
     echo -e "Idle time updated to ${GREEN}$1 seconds${NC}."
     echo "Restarting service for changes to take effect..."
