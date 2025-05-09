@@ -114,13 +114,16 @@ show_menu() {
     esac
 }
 
+# Get script name without path for help display
+SCRIPT_NAME=$(basename "$0")
+
 # If arguments are provided, use command line mode
 if [ $# -gt 0 ]; then
     case "$1" in
         --time|-t)
             if [ -z "$2" ]; then
                 echo "Please provide the idle time in seconds."
-                echo "Example: $0 --time 120"
+                echo "Example: $SCRIPT_NAME --time 120"
                 exit 1
             fi
             update_idle_time "$2"
@@ -136,12 +139,12 @@ if [ $# -gt 0 ]; then
             ;;
         --help|-h)
             echo "Usage:"
-            echo "  $0                  # Interactive menu"
-            echo "  $0 --time 120       # Set idle time to 120 seconds"
-            echo "  $0 --start          # Start the service"
-            echo "  $0 --stop           # Stop the service"
-            echo "  $0 --status         # Show current settings"
-            echo "  $0 --help           # Show this help"
+            echo "  $SCRIPT_NAME                  # Interactive menu"
+            echo "  $SCRIPT_NAME --time SECONDS   # Set idle time to any number of seconds"
+            echo "  $SCRIPT_NAME --start          # Start the service"
+            echo "  $SCRIPT_NAME --stop           # Stop the service"
+            echo "  $SCRIPT_NAME --status         # Show current settings"
+            echo "  $SCRIPT_NAME --help           # Show this help"
             ;;
         *)
             echo "Unknown option: $1"
