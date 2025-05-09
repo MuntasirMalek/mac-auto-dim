@@ -10,6 +10,7 @@ git clone https://github.com/MuntasirMalek/mac-auto-dim.git .
 # Try different methods to ensure it stops on all macOS versions
 launchctl unload ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
 launchctl remove com.user.auto_dim 2>/dev/null
+launchctl bootout gui/$UID/com.user.auto_dim 2>/dev/null
 pkill -f auto_dim.sh 2>/dev/null
 rm -f ~/bin/auto_dim.sh ~/bin/configure.sh ~/bin/auto-dim ~/Library/LaunchAgents/com.user.auto_dim.plist ~/.prev_brightness
 
@@ -35,14 +36,35 @@ chmod 644 ~/Library/LaunchAgents/com.user.auto_dim.plist
 sed -i "" "s/<key>IDLE_THRESHOLD<\/key>.*/<key>IDLE_THRESHOLD<\/key>\\
      <string>60<\/string>/g" ~/Library/LaunchAgents/com.user.auto_dim.plist
 
-# Start the auto-dim service
-launchctl load ~/Library/LaunchAgents/com.user.auto_dim.plist
+# Start the auto-dim service - try multiple methods for compatibility with different macOS versions
+echo "Starting service..."
+
+# Method 1: Standard launchctl load
+launchctl load ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
+
+# Method 2: Use bootstrap if load failed
+if ! launchctl list | grep -q "com.user.auto_dim"; then
+    launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.user.auto_dim.plist 2>/dev/null
+fi
+
+# Method 3: Use legacy submit method as last resort
+if ! launchctl list | grep -q "com.user.auto_dim"; then
+    launchctl submit -l com.user.auto_dim -- /bin/bash ~/bin/auto_dim.sh 2>/dev/null
+fi
+
+# Check if service started
+if launchctl list | grep -q "com.user.auto_dim"; then
+    STATUS="started"
+else
+    STATUS="failed to start (you can start it manually with ~/bin/auto-dim --start)"
+fi
 
 # Clean up installation files
 cd ~
 rm -rf /tmp/mac-auto-dim-install
 
 echo "✅ Mac Auto-Dim installed successfully with a 1-minute timeout!"
+echo "   Service $STATUS."
 echo "   Your screen will now dim after 1 minute of inactivity."
 echo "   To configure, simply run: ~/bin/auto-dim"
 echo "   For available commands, run: ~/bin/auto-dim --help"

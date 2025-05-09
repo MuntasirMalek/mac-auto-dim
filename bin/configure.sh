@@ -5,6 +5,7 @@
 
 # Colors for prettier output
 GREEN='\033[0;32m'
+RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
@@ -27,7 +28,7 @@ show_settings() {
     if launchctl list | grep -q "com.user.auto_dim"; then
         echo -e "• Status: ${GREEN}Running${NC}"
     else
-        echo -e "• Status: ${GREEN}Stopped${NC}"
+        echo -e "• Status: ${RED}Stopped${NC}"
     fi
 }
 
@@ -55,14 +56,26 @@ update_idle_time() {
 
 # Function to start the service
 start_service() {
+    # Try different methods to ensure service starts
     launchctl load "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
+    
+    # If that didn't work, try bootstrap method
+    if ! launchctl list | grep -q "com.user.auto_dim"; then
+        launchctl bootstrap gui/$UID "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
+    fi
+    
+    # If still not started, try legacy method
+    if ! launchctl list | grep -q "com.user.auto_dim"; then
+        launchctl submit -l com.user.auto_dim -- /bin/bash "$HOME/bin/auto_dim.sh" 2>/dev/null
+    fi
 }
 
 # Function to stop the service
 stop_service() {
-    # Try both methods to ensure it stops
+    # Try different methods to ensure it stops
     launchctl unload "$HOME/Library/LaunchAgents/com.user.auto_dim.plist" 2>/dev/null
     launchctl remove "com.user.auto_dim" 2>/dev/null
+    launchctl bootout gui/$UID/com.user.auto_dim 2>/dev/null
     
     # As a fallback, kill any running processes
     pkill -f "auto_dim.sh" 2>/dev/null
