@@ -40,9 +40,21 @@ update_idle_time() {
         return 1
     fi
     
-    # Update the plist file
-    sed -i '' "s/<key>IDLE_THRESHOLD<\/key>.*/<key>IDLE_THRESHOLD<\/key>\\
-     <string>$1<\/string>/g" "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
+    # First, extract the EnvironmentVariables section
+    env_vars_section=$(awk '/<key>EnvironmentVariables<\/key>/,/<\/dict>/' "$HOME/Library/LaunchAgents/com.user.auto_dim.plist")
+    
+    # Create a clean section with just PATH and the new IDLE_THRESHOLD
+    new_env_vars="   <key>EnvironmentVariables</key>
+   <dict>
+     <key>PATH</key>
+     <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+     <key>IDLE_THRESHOLD</key>
+     <string>$1</string>
+   </dict>"
+    
+    # Replace the entire EnvironmentVariables section
+    sed -i '' "/<key>EnvironmentVariables<\/key>/,/<\/dict>/c\\
+$new_env_vars" "$HOME/Library/LaunchAgents/com.user.auto_dim.plist"
     
     echo -e "Idle time updated to ${GREEN}$1 seconds${NC}."
     echo "Restarting service for changes to take effect..."
