@@ -119,9 +119,7 @@ show_menu() {
             ;;
         2)
             control_service "start"
-            echo
-            read -p "Press Enter to continue..."
-            show_menu
+            exit 0
             ;;
         3)
             control_service "stop"
