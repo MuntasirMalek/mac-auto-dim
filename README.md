@@ -87,10 +87,9 @@ This brings up a simple menu where you can:
 Quick commands for common actions:
 
 ```bash
-# Set idle time to any number of seconds (examples below)
-~/bin/auto-dim --time 120   # 2 minutes
-~/bin/auto-dim --time 30    # 30 seconds
-~/bin/auto-dim --time 300   # 5 minutes
+# Set idle time to any number of seconds
+~/bin/auto-dim --time SECONDS
+~/bin/auto-dim --time 30 #Example for 30 seconds
 
 # Turn auto-dim on
 ~/bin/auto-dim --start
